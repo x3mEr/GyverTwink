@@ -116,7 +116,7 @@ void draw() {
     if (millis() - actionTmr > 400) {
       actionTmr = millis();
       if (calibCount == 0) makeMap(0);
-      if (calibCount > int(leds.text)) {
+      if (calibCount > int(strips.text) * int(leds.text)) {
         calibF = false;
         sendData(new int[] {3, 2, calibCount/100, calibCount%100, maxX, maxY});
         calibCount = 0;

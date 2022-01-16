@@ -45,14 +45,30 @@ void parsing() {
         answ[7] = cfg.prdCh;
         answ[8] = cfg.turnOff;
         answ[9] = cfg.offTmr;
-        reply(answ, 10);
+        answ[10] = cfg.strAm;
+        reply(answ, 11);
         break;
 
       case 2:   // приём настроек
         forceTmr.stop();
         switch (ubuf[3]) {
-          case 0: cfg.ledAm = ubuf[4] * 100 + ubuf[5];
-            strip->setLeds(leds, cfg.ledAm);
+          case 0: 
+            cfg.ledAm = ubuf[4] * 100 + ubuf[5];
+            cfg.strAm = ubuf[6];
+            /*free(leds);
+            leds = (CRGB *)malloc(cfg.strAm * cfg.ledAm * sizeof(CRGB));*/
+            FastLED.clear(true);
+                        
+            if(cfg.strAm<2)
+              FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+            if(cfg.strAm<3)  
+              FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+            if(cfg.strAm<4)
+              FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+  
+
+            
+            // strip->setLeds(leds, cfg.ledAm);
             break;
           case 1: cfg.power = ubuf[4];
             break;
@@ -84,7 +100,10 @@ void parsing() {
             if (cfg.turnOff) offTmr.restart();
             break;
         }
-        if (!cfg.power) strip->showLeds(0);
+        if (!cfg.power) {
+          FastLED.setBrightness(0);
+          FastLED.show();
+        }
         EEcfg.update();
         break;
 
@@ -93,8 +112,9 @@ void parsing() {
           case 0:   // запуск калибровки
             DEBUGLN("Calibration start");
             calibF = true;
-            strip->clearLedData();
-            strip->showLeds(0);
+            FastLED.clear(true);
+            FastLED.setBrightness(0);
+            FastLED.show();
             break;
 
           case 1:   // следующий лед
@@ -104,24 +124,26 @@ void parsing() {
                 xy[curLed - 1][0] = ubuf[6];
                 xy[curLed - 1][1] = ubuf[7];
               }
-              strip->clearLedData();
+              FastLED.clear(true);
               leds[curLed] = CRGB::White;
-              strip->showLeds(200);
+              FastLED.setBrightness(200);
+              FastLED.show();
             }
             break;
 
           case 2:   // калибровка окончена
             DEBUGLN("Finished");
             calibF = false;
-            strip->clearLedData();
-            strip->showLeds(0);
+            FastLED.clear(true);
+            FastLED.setBrightness(0);
+            FastLED.show();
             EExy.updateNow();
 
             mm.minY = 255;
             mm.maxY = 0;
             mm.minX = 255;
             mm.maxX = 0;
-            for (int i = 0; i < cfg.ledAm; i++) {
+            for (int i = 0; i < cfg.strAm * cfg.ledAm; i++) {
               mm.minX = min(mm.minX, xy[i][0]);
               mm.maxX = max(mm.maxX, xy[i][0]);
               mm.minY = min(mm.minY, xy[i][1]);

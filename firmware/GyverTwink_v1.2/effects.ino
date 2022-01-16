@@ -22,7 +22,7 @@ void effects() {
     byte curPal = thisEffect;
     if (curPal >= ACTIVE_PALETTES) curPal -= ACTIVE_PALETTES;
 
-    for (int i = 0; i < cfg.ledAm; i++) {
+    for (int i = 0; i < cfg.strAm * cfg.ledAm; i++) {
       byte idx;
 
       if (thisEffect < ACTIVE_PALETTES) {
@@ -43,6 +43,7 @@ void effects() {
     if (fadeCount) fadeCount--;
 
     countP += (speed - 128) / 10;
-    strip->showLeds(cfg.bright);
+    FastLED.setBrightness(cfg.bright);
+    FastLED.show();
   }
 }

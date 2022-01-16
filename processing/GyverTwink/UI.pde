@@ -1,4 +1,5 @@
 byte curTab = 0;
+TextInput strips = new TextInput();
 TextInput leds = new TextInput();
 TextInput subnet = new TextInput();
 DropDown dropIP = new DropDown();
@@ -65,6 +66,7 @@ void cfgTab() {
   Label("Connection:", 15);
   if (found) {
     Divider(width-offs*2);
+    Label("Strips amount:", 15);
     Label("LED amount:", 15);
     Label("Power:", 15);
     Label("Brightness:", 15);
@@ -86,11 +88,17 @@ void cfgTab() {
     uiStep();
     uiStep();
     uiStep();
+    if (strips.show(WW, uiStep(), W) && androidMode) openKeyboard();
+    if (strips.done()) {
+      if (androidMode) closeKeyboard();
+      int am = int(leds.text);
+      sendData(new int[] {2, 0, am/100, am % 100, int(strips.text)});
+    }
     if (leds.show(WW, uiStep(), W) && androidMode) openKeyboard();
     if (leds.done()) {
       if (androidMode) closeKeyboard();
       int am = int(leds.text);
-      sendData(new int[] {2, 0, am/100, am % 100});
+      sendData(new int[] {2, 0, am/100, am % 100, int(strips.text)});
     }
     if (power.show(WW, uiStep())) sendData(new int[] {2, 1, int(power.value)});
     if (bri.show(0, 255, WW, uiStep(), W)) sendData(new int[] {2, 2, int(bri.value)});
@@ -183,7 +191,7 @@ void calibTab() {
       actionTmr = millis() + 2000;
     }
 
-    Label(str(calibCount*100/(int(leds.text)+1))+'%', 15, uiPrevX()+15, uiPrevStep());
+    Label(str(calibCount)+" of " + str(int(strips.text) * int(leds.text)) + " (" + str(calibCount*100/((int(strips.text) * int(leds.text))+1))+"%)", 15, uiPrevX()+15, uiPrevStep());
     if (Button("Stop")) {
       calibF = false;
       sendData(new int[] {3, 2});

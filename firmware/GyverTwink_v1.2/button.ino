@@ -5,7 +5,10 @@ void button() {
   if (btn.hasClicks(1)) {
     DEBUGLN("1x click - power");
     cfg.power = !cfg.power;
-    if (!cfg.power) strip->showLeds(0);
+    if (!cfg.power) {
+        FastLED.setBrightness(0);
+        FastLED.show();
+    }
     EEcfg.update();
   }
   
@@ -23,9 +26,11 @@ void button() {
       bri = constrain(bri, 0, 255);      
       cfg.bright = bri;
       if (bri == 255) {
-        strip->showLeds(0);
+        FastLED.setBrightness(0);
+        FastLED.show();
         delay(100);
-        strip->showLeds(bri);
+        FastLED.setBrightness(bri);
+        FastLED.show();
       }
       EEcfg.update();
     }

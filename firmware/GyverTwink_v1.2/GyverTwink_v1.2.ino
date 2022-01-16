@@ -23,15 +23,17 @@
 #define BTN_PIN D3      // пин кнопки
 #define BTN_TOUCH 0     // 1 - сенсорная кнопка, 0 - нет
 
-#define LED_PIN D1      // пин ленты
 #define LED_TYPE WS2812 // чип ленты
-#define LED_ORDER GRB   // порядок цветов ленты
-#define LED_MAX 500     // макс. светодиодов
+#define LED_ORDER RGB   // порядок цветов ленты
+
+#define NUM_STRIPS 3
+#define NUM_LEDS_PER_STRIP 100
+#define NUM_LEDS (NUM_LEDS_PER_STRIP * NUM_STRIPS)
 
 // имя точки в режиме AP
 #define GT_AP_SSID "GyverTwink"
 #define GT_AP_PASS "12345678"
-//#define DEBUG_SERIAL_GT   // раскомментируй, чтобы включить отладку
+#define DEBUG_SERIAL_GT   // раскомментируй, чтобы включить отладку
 
 // ================== LIBS ==================
 #include <ESP8266WiFi.h>
@@ -47,15 +49,15 @@
 WiFiServer server(80);
 WiFiUDP udp;
 EEManager EEwifi(portalCfg);
-CRGB leds[LED_MAX];
-CLEDController *strip;
+CRGB leds[NUM_LEDS];
 EncButton<EB_TICK, BTN_PIN> btn;
 IPAddress myIP;
 
 // ================== EEPROM BLOCKS ==================
 struct Cfg {
-  uint16_t ledAm = 50;
-  bool power = 1;
+  uint16_t strAm = 3;
+  uint16_t ledAm = 100;
+  bool power = 0;
   byte bright = 100;
   bool autoCh = 0;
   bool rndCh = 0;
@@ -66,7 +68,7 @@ struct Cfg {
 Cfg cfg;
 EEManager EEcfg(cfg);
 
-byte xy[LED_MAX][2];
+byte xy[NUM_LEDS][2];
 EEManager EExy(xy);
 
 struct MM {
@@ -126,14 +128,14 @@ void setup() {
 
   EEcfg.begin(EEwifi.nextAddr(), 'a');
   EEeff.begin(EEcfg.nextAddr(), 'a');
-  EEmm.begin(EEeff.nextAddr(), (uint8_t)LED_MAX);
-  EExy.begin(EEmm.nextAddr(), (uint8_t)LED_MAX);
+  EEmm.begin(EEeff.nextAddr(), (uint8_t)NUM_LEDS);
+  EExy.begin(EEmm.nextAddr(), (uint8_t)NUM_LEDS);
 
   switchTmr.setPrd(cfg.prdCh * 60000ul);
   if (cfg.autoCh) switchTmr.restart();
   switchEff();
   cfg.turnOff = false;
-  strip->setLeds(leds, cfg.ledAm);
+  //FastLED.setLeds(leds, cfg.ledAm);
   udp.begin(8888);
 }
 
@@ -161,7 +163,8 @@ void loop() {
     offTmr.stop();
     cfg.turnOff = false;
     cfg.power = false;
-    strip->showLeds(0);
+    FastLED.setBrightness(0);
+    FastLED.show();
     EEcfg.update();
     DEBUGLN("Off tmr");
   }

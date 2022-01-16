@@ -1,6 +1,6 @@
 void receive(byte[] ubuf) {
   if (ubuf[0] != 'G' || ubuf[1] != 'T') return;
-  int[] data = new int[10];
+  int[] data = new int[11];
   for (int i = 0; i < ubuf.length - 2; i++) {
     data[i] = int(ubuf[i+2]);
     //println(data[i]);
@@ -24,6 +24,7 @@ void receive(byte[] ubuf) {
     prd.value = data[7];
     offT.value = boolean(data[8]);
     offS.value = data[9];
+    strips.text = str(data[10]);
     break;
 
   case 4: // Эффект

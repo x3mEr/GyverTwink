@@ -14,14 +14,26 @@ void portalRoutine() {
 }
 
 void startStrip() {
-  strip = &FastLED.addLeds<LED_TYPE, LED_PIN, LED_ORDER>(leds, LED_MAX).setCorrection(TypicalLEDStrip);
-  strip->setLeds(leds, LED_MAX);
-  strip->clearLedData();
+  FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
+  
+  FastLED.clear(true);
   // выводим ргб
   leds[0] = CRGB::Red;
   leds[1] = CRGB::Green;
   leds[2] = CRGB::Blue;
-  strip->showLeds(50);
+
+  leds[NUM_LEDS_PER_STRIP+0] = CRGB::Red;
+  leds[NUM_LEDS_PER_STRIP+1] = CRGB::Green;
+  leds[NUM_LEDS_PER_STRIP+2] = CRGB::Blue;
+
+  leds[2*NUM_LEDS_PER_STRIP+0] = CRGB::Red;
+  leds[2*NUM_LEDS_PER_STRIP+1] = CRGB::Green;
+  leds[2*NUM_LEDS_PER_STRIP+2] = CRGB::Blue;
+ 
+  FastLED.setBrightness(50);
+  FastLED.show();
 }
 
 bool checkButton() {
