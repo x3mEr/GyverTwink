@@ -54,11 +54,11 @@ private int card_x = 0;
 private int card_y = 0;
 
 private int medFontSize = 15;
-private int smallFontSize = 15;
+private int smallFontSize = 10;
 private int largeFontSize = 25;
 
 private int d_medFontSize = 15;
-private int d_smallFontSize = 15;
+private int d_smallFontSize = 10;
 private int d_largeFontSize = 25;
 
 private int d_big = 200;
@@ -841,11 +841,13 @@ public class Slider {
         ellipse(pos, y+h/2, h, h); 
         fill(c_hover);
         ellipse(pos, y+h/2, h-s_stroke, h-s_stroke);
+        textSize(smallFontSize);fill(255);textAlign(CENTER, CENTER);text(str(int(value)), pos-h/2, y, h, h);textSize(medFontSize);
       } else {
         fill(red(c_hover), green(c_hover), blue(c_hover), 50);
         ellipse(pos+x, y+h/2, h, h); 
         fill(c_hover);
         ellipse(pos+x, y+h/2, h-s_stroke, h-s_stroke);
+        textSize(smallFontSize);fill(255);textAlign(CENTER, CENTER);text(str(int(value)), pos+x-h/2, y, h, h);textSize(medFontSize);
       }
     } 
     //Normal
@@ -853,6 +855,7 @@ public class Slider {
       noStroke();
       fill(c_hover);
       ellipse(pos+x, y+h/2, h-s_stroke, h-s_stroke);
+      textSize(smallFontSize);fill(255);textAlign(CENTER, CENTER);text(str(int(value)), pos+x-h/2, y, h, h);textSize(medFontSize);
     }
     if ((chFlag && millis() - tmr > 50) || (!chFlag && flag)) {
       tmr = millis();

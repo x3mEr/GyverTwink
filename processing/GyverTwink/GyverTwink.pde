@@ -50,9 +50,12 @@ UDP udp;
 // ============== VARIABLES ================
 int X = 60;     // размер сетки по X (задан вручную)
 int Y;          // размер сетки по Y
+int XX = 0;
+int YY = 0;
 int maxX, maxY; // точка максимума в координатах сетки
 int size;       // размер "пикселя"
 int[][] brMap;  // карта яркости 
+int[][] picMap; // картинка
 PImage frame, ring;
 boolean camReady = false;
 boolean camStart = false;

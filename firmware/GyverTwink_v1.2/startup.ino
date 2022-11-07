@@ -46,7 +46,7 @@ bool checkButton() {
 }
 
 void setupAP() {
-  DEBUG("AP Mode");
+  DEBUGLN("AP Mode");
   WiFi.disconnect();
   WiFi.mode(WIFI_AP);
   WiFi.softAP(GT_AP_SSID, GT_AP_PASS);
@@ -56,15 +56,20 @@ void setupAP() {
 }
 
 void setupSTA() {
-  DEBUG("Connecting to AP... ");
+  DEBUGLN("Connecting to AP... ");
+  //Serial.setDebugOutput(true);
   WiFi.softAPdisconnect();
   WiFi.disconnect();
-  WiFi.mode(WIFI_STA);
+  //WiFi.mode(WIFI_STA);
+  Serial.printf("Wi-Fi mode set to WIFI_STA %s\n", WiFi.mode(WIFI_STA) ? "" : "Failed!");\
   WiFi.begin(portalCfg.SSID, portalCfg.pass);
+  Serial.printf("Connection status: %d\n", WiFi.status());
+  //WiFi.printDiag(Serial);
+  //while (WiFi.waitForConnectResult() != WL_CONNECTED);
   uint32_t tmr = millis();
   bool state = false;
   while (millis() - tmr < 15000) {
-    if (WiFi.status() == WL_CONNECTED) {
+    if (WiFi.waitForConnectResult() == WL_CONNECTED) {
       fadeBlink(CRGB::Green);
       DEBUGLN("ok");
       myIP = WiFi.localIP();

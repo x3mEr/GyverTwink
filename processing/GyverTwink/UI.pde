@@ -1,4 +1,6 @@
 byte curTab = 0;
+int currentX=0, currentY=0;
+
 TextInput strips = new TextInput();
 TextInput leds = new TextInput();
 TextInput subnet = new TextInput();
@@ -43,17 +45,19 @@ String[] effs = {
 void ui() {
   uiFill();
   // ====== TABS =======
-  int w = width / 3;
+  int w = width / 4;
   int h = w / 2;
   int y = height - h;
 
   if (IconButton("wrench", 0, y, w, h, curTab == 0)) switchCfg();
   if (IconButton("adjust", w*1, y, w, h, curTab == 1)) switchEffects();
   if (IconButton("camera", w*2, y, w, h, curTab == 2)) switchCalib();
+  if (IconButton("paintbrush", w*3, y, w, h, curTab == 3)) switchPaint();
 
   if (curTab == 0) cfgTab();
   if (curTab == 1) effTab();
   if (curTab == 2) calibTab();
+  if (curTab == 3) paintTab();
 }
 
 void cfgTab() {
@@ -67,7 +71,7 @@ void cfgTab() {
   if (found) {
     Divider(width-offs*2);
     Label("Strips amount:", 15);
-    Label("LED amount:", 15);
+    Label("LEDs per strip:", 15);
     Label("Power:", 15);
     Label("Brightness:", 15);
     Divider(width-offs*2);
@@ -91,15 +95,15 @@ void cfgTab() {
     if (strips.show(WW, uiStep(), W) && androidMode) openKeyboard();
     if (strips.done()) {
       if (androidMode) closeKeyboard();
-      int am = int(leds.text);
-      sendData(new int[] {2, 0, am/100, am % 100, int(strips.text)});
+      sendData(new int[] {2, 9, int(strips.text)});
     }
+    
     if (leds.show(WW, uiStep(), W) && androidMode) openKeyboard();
     if (leds.done()) {
       if (androidMode) closeKeyboard();
-      int am = int(leds.text);
-      sendData(new int[] {2, 0, am/100, am % 100, int(strips.text)});
+      sendData(new int[] {2, 0, int(leds.text)});
     }
+
     if (power.show(WW, uiStep())) sendData(new int[] {2, 1, int(power.value)});
     if (bri.show(0, 255, WW, uiStep(), W)) sendData(new int[] {2, 2, int(bri.value)});
     uiStep();
@@ -146,14 +150,14 @@ void effTab() {
 
     uiResetStep(50);
 
-    if (androidMode) uiSetScale(androidScale*0.8);
-    else uiSetScale(pcScale*0.7);
+    //if (androidMode) uiSetScale(androidScale*0.8);
+    //else uiSetScale(pcScale*0.7);
     if (dropEff.show(effs, WW, uiStep(), W-s_height)) {
       sendData(new int[] {4, 0, dropEff.selected});
       parseMode = 4;
     }
-    if (androidMode) uiSetScale(androidScale);
-    else uiSetScale(pcScale);
+    //if (androidMode) uiSetScale(androidScale);
+    //else uiSetScale(pcScale);
   } else Label("No devices detected!", 15);
 }
 
@@ -180,24 +184,26 @@ void calibTab() {
     //image(frame, (width-frame.width)/2, 0);
     //if (calibF) image(ring, (width-ring.width)/2, 0);
 
-    uiResetStep(height - width/6 - 2*_step_y);
+    uiResetStep(height - width/6 - 1*_step_y);
     uiResetX(0);
     uiGlobalX(0);
 
-    if (Button("Start")) {
+    if (Button("Start", 15)) {
       calibF = true;
       sendData(new int[] {3, 0});
       calibCount = 0;
       actionTmr = millis() + 2000;
     }
 
-    Label(str(calibCount)+" of " + str(int(strips.text) * int(leds.text)) + " (" + str(calibCount*100/((int(strips.text) * int(leds.text))+1))+"%)", 15, uiPrevX()+15, uiPrevStep());
-    if (Button("Stop")) {
+    if (Button("Stop", 165, uiPrevStep())) {
       calibF = false;
       sendData(new int[] {3, 2});
       calibCount = 0;
     }
-  } else {
+    
+    Label(str(calibCount)+" of " + str(int(strips.text) * int(leds.text)) + " (" + str(calibCount*100/((int(strips.text)) * int(leds.text)+1))+"%)", 15, uiPrevX()+15, uiPrevStep());
+
+} else {
     uiGlobalX(offs);
     uiResetStep(50);
     uiGlobalX(offs);
@@ -205,18 +211,55 @@ void calibTab() {
   }
 }
 
+void paintTab() {
+  uiGlobalX(offs);
+  uiResetStep(15);
+  LabelCenter("Paint", 20);
+  Label("XX:" + XX + " " + _x_offs + " YY:" + YY + " " + _pos_y + " cX:" + currentX + " cY:" + currentY, 15);
+  int size = 8;
+  int xOffset = (width-(X * size)) / 2;
+  int yOffset = _pos_y;
+  int tMedFontSize = medFontSize;
+  medFontSize = 6;
+  for(int y=0;y<YY;y++) {
+    for(int x=0;x<XX;x++) {
+      currentX = x; currentY = y;
+      int c = picMap[x][y];
+      
+      if(Button(((c==1)?"O":" "), xOffset + x*size, yOffset + y*size, size, size)) {
+        picMap[x][y] = 1;
+        sendData(new int[] {5, 1, x, y, 2});
+      }
+    }
+  }
+  medFontSize = tMedFontSize;
+  
+  
+  
+}
+
+
 void switchCfg() {
   curTab = 0;
+  sendData(new int[] {5, 2});
   sendData(new int[] {2, 7});
   stopCam();
 }
 void switchEffects() {
   curTab = 1;
   stopCam();
+  sendData(new int[] {5, 2});
   sendData(new int[] {4, 0, dropEff.selected});
   parseMode = 4;
 }
 void switchCalib() {
   curTab = 2;
+  sendData(new int[] {5, 2});
   if (found) startCam();
+}
+void switchPaint() {
+  curTab = 3;
+  stopCam();
+  sendData(new int[] {5, 0});
+  parseMode = 5;
 }

@@ -36,8 +36,8 @@ void parsing() {
 
       case 1:   // запрос настроек
         answ[0] = 1;
-        answ[1] = cfg.ledAm / 100;
-        answ[2] = cfg.ledAm % 100;
+        answ[1] = cfg.ledAm;
+        answ[2] = cfg.strAm;
         answ[3] = cfg.power;
         answ[4] = cfg.bright;
         answ[5] = cfg.autoCh;
@@ -45,18 +45,14 @@ void parsing() {
         answ[7] = cfg.prdCh;
         answ[8] = cfg.turnOff;
         answ[9] = cfg.offTmr;
-        answ[10] = cfg.strAm;
-        reply(answ, 11);
+        reply(answ, 10);
         break;
 
       case 2:   // приём настроек
         forceTmr.stop();
         switch (ubuf[3]) {
           case 0: 
-            cfg.ledAm = ubuf[4] * 100 + ubuf[5];
-            cfg.strAm = ubuf[6];
-            /*free(leds);
-            leds = (CRGB *)malloc(cfg.strAm * cfg.ledAm * sizeof(CRGB));*/
+            cfg.ledAm = ubuf[4];
             FastLED.clear(true);
                         
             if(cfg.strAm<2)
@@ -65,10 +61,18 @@ void parsing() {
               FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
             if(cfg.strAm<4)
               FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
-  
 
-            
-            // strip->setLeds(leds, cfg.ledAm);
+            break;
+          case 9: 
+            cfg.strAm = ubuf[4];
+            FastLED.clear(true);
+                        
+            if(cfg.strAm<2)
+              FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+            if(cfg.strAm<3)  
+              FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+            if(cfg.strAm<4)
+              FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
             break;
           case 1: cfg.power = ubuf[4];
             break;
@@ -177,6 +181,38 @@ void parsing() {
           case 3:   // скорость
             effs[forceEff].speed = ubuf[4];
             break;
+        }
+        break;
+      case 5:   // рисование
+        switch (ubuf[3]) {
+          case 0:   // переход в режим рисования
+            DEBUGLN("Paint start");
+            DEBUGLN(mm.w);
+            DEBUGLN(mm.h);
+            paintF = true;
+            answ[0] = 5;
+            answ[1] = mm.w;
+            answ[2] = mm.h;
+            reply(answ, 3);
+
+            FastLED.clear(true);
+            FastLED.setBrightness(0);
+            FastLED.show();
+          break;
+
+          case 1:   // рисуем пиксель
+            {
+              drawPixelXYD(ubuf[4], ubuf[5], ubuf[6], CRGB::White);
+              FastLED.setBrightness(200);
+              FastLED.show();
+            }
+            break;
+          
+          case 2:   // завершение режима рисования
+            DEBUGLN("Paint end");
+            paintF = false;
+          break;
+          
         }
         break;
     }
