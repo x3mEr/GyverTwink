@@ -215,23 +215,26 @@ void paintTab() {
   uiGlobalX(offs);
   uiResetStep(15);
   LabelCenter("Paint", 20);
+  //println("0:x:" + xy[0][0] + " 0:y:" + xy[0][1]);
   Label("XX:" + XX + " " + _x_offs + " YY:" + YY + " " + _pos_y + " cX:" + currentX + " cY:" + currentY, 15);
-  int size = 8;
-  int xOffset = (width-(X * size)) / 2;
+  int step = 7;
+  int size = 12;
+  int xOffset = (width-(X * step)) / 2;
   int yOffset = _pos_y;
   int tMedFontSize = medFontSize;
   medFontSize = 6;
-  for(int y=0;y<YY;y++) {
-    for(int x=0;x<XX;x++) {
-      currentX = x; currentY = y;
-      int c = picMap[x][y];
-      
-      if(Button(((c==1)?"O":" "), xOffset + x*size, yOffset + y*size, size, size)) {
-        picMap[x][y] = 1;
-        sendData(new int[] {5, 1, x, y, 2});
+  if(xy != null) {
+    for(int i=0;i<ledsCount;i++) {
+      currentX = xy[i][0]; currentY = xy[i][1];
+      int c = xy[i][2];
+     
+      if(Button(((c==1)?"O":" "), xOffset + currentX*step, yOffset +currentY*step, size, size)) {
+        xy[i][2] = (byte)(1 - xy[i][2]);
+        sendData(new int[] {5, 1, currentX, currentY, 2, xy[i][2]});
       }
     }
   }
+
   medFontSize = tMedFontSize;
   
   
@@ -260,6 +263,8 @@ void switchCalib() {
 void switchPaint() {
   curTab = 3;
   stopCam();
-  sendData(new int[] {5, 0});
+ 
   parseMode = 5;
+  xy = new byte[ledsCount][3];
+  sendData(new int[] {5, 0});
 }

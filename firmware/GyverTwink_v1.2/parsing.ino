@@ -1,11 +1,20 @@
 #define MAX_UDP_PACKET 30
 byte ubuf[MAX_UDP_PACKET];
 
-void reply(byte* data, byte size) {
+void replyStart() {
   udp.beginPacket(udp.remoteIP(), udp.remotePort());
   udp.write("GT");
+}
+void replyData(byte* data, byte size) {
   udp.write(data, size);
+}
+void replyEnd() {
   udp.endPacket();
+}
+void reply(byte* data, byte size) {
+  replyStart();
+  replyData(data, size);
+  replyEnd();
 }
 
 void parsing() {
@@ -187,13 +196,22 @@ void parsing() {
         switch (ubuf[3]) {
           case 0:   // переход в режим рисования
             DEBUGLN("Paint start");
-            DEBUGLN(mm.w);
-            DEBUGLN(mm.h);
             paintF = true;
             answ[0] = 5;
             answ[1] = mm.w;
             answ[2] = mm.h;
+            DEBUG(mm.w);DEBUG(" ");DEBUGLN(mm.h);
             reply(answ, 3);
+            
+            for(int i=0;i<300;i+=50) {
+              answ[0] = 6;
+              answ[1] = i;
+              answ[2] = 50;
+              replyStart();
+              replyData(answ, 3);
+              replyData((byte *)(xy + i * 2), 50 * 2);
+              replyEnd();
+            }
 
             FastLED.clear(true);
             FastLED.setBrightness(0);
@@ -202,7 +220,11 @@ void parsing() {
 
           case 1:   // рисуем пиксель
             {
-              drawPixelXYD(ubuf[4], ubuf[5], ubuf[6], CRGB::White);
+              CRGB c = CRGB::Black;
+              if(ubuf[7]==1) {
+                c = CRGB::White;
+              }
+              drawPixelXYD(ubuf[4], ubuf[5], ubuf[6], c);
               FastLED.setBrightness(200);
               FastLED.show();
             }
@@ -212,9 +234,29 @@ void parsing() {
             DEBUGLN("Paint end");
             paintF = false;
           break;
+        }
+        break;
+        case 6:   // пикели
+        switch (ubuf[3]) {
+          case 0:   // передать расположение пикселей
+            DEBUGLN("pixels part");
+            answ[0] = 6;
+            answ[1] = ubuf[4];
+            answ[2] = ubuf[5];
+            for (int i = ubuf[4]; i < ubuf[4] + ubuf[5]; i++) {
+              DEBUG(i);DEBUG(" ");
+              DEBUG(xy[i][0]);DEBUG(" ");
+              DEBUGLN(xy[i][1]);
+            }
+            replyStart();
+            replyData(answ, 3);
+            replyData((byte *)(xy + ubuf[4] * 2), ubuf[5] * 2);
+            replyEnd();
+          break;
           
         }
         break;
+
     }
   }
 }

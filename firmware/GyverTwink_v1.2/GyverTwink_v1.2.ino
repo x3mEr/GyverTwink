@@ -191,7 +191,7 @@ void loop() {
   // показываем эффект, если включены
   if (!calibF && !paintF && cfg.power) {
     //effectsTick();
-    sparklesRoutine();
+    //sparklesRoutine();
     //rainbowVerticalRoutine();
     //snowStormRoutine();
     //matrixRoutine();
@@ -210,9 +210,9 @@ void loop() {
     drawPixelXY(25,25,CRGB::Cyan);
     drawPixelXY(30,30,CRGB::Magenta);
     drawPixelXY(35,35,CRGB::Yellow);*/
-    FastLED.setBrightness(cfg.bright);
-    FastLED.show(); 
+    //setBrightness(cfg.bright);
+    //FastLED.show(); 
     
-    //effects();
+    effects();
   }
 }

@@ -1,10 +1,21 @@
 void receive(byte[] ubuf) {
   if (ubuf[0] != 'G' || ubuf[1] != 'T') return;
   int[] data = new int[11];
-  for (int i = 0; i < ubuf.length - 2; i++) {
+  for (int i = 0; i < min(ubuf.length - 2,11); i++) {
     data[i] = int(ubuf[i+2]);
-    //println(data[i]);
   }
+  
+  switch (data[0]) {
+    case 6:
+      println("receive " + data[0] + " " + data[1] + " " + data[2] + " s:"+ubuf.length);
+      for(int i=data[1];i<(data[1] + data[2]);i++) {
+        xy[i][0] = ubuf[5+(i%50)*2];
+        xy[i][1] = ubuf[5+(i%50)*2+1];
+      }
+    
+    break;
+  }
+  
 
   if (parseMode != data[0]) return;
 
@@ -18,6 +29,7 @@ void receive(byte[] ubuf) {
     searchF = false;
     leds.text = str(data[1]);
     strips.text = str(data[2]);
+    ledsCount = data[1] * data[2];
     power.value = boolean(data[3]);
     bri.value = data[4];
     auto.value = boolean(data[5]);
@@ -35,8 +47,6 @@ void receive(byte[] ubuf) {
   case 5: // Размер окна рисования
     XX = data[1];
     YY = data[2];
-    picMap = new int[XX][YY];
     break;
-
   }
 }
