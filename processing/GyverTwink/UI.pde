@@ -39,7 +39,12 @@ String[] effs = {
   "18. Hot_noise", 
   "19. Pink_noise", 
   "20. Cyber_noise", 
-  "21. RedWhite_noise", 
+  "21. RedWhite_noise",
+
+  "22. Sparkles",
+  "23. Rainbow Vert",
+  "24. Rainbow Horiz",
+  "25. Rainbow Diag",
 };
 
 void ui() {

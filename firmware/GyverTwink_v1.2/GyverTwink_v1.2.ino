@@ -30,6 +30,32 @@
 #define NUM_LEDS_PER_STRIP 100
 #define NUM_LEDS (NUM_LEDS_PER_STRIP * NUM_STRIPS)
 
+#define EFF_SPARKLES          (22U)                          // Конфетти
+#define EFF_RAINBOW_VER       (23U)                          // Радуга вертикальная
+#define EFF_RAINBOW_HOR       (24U)                          // Радуга горизонтальная
+#define EFF_RAINBOW_DIAG      (25U)                          // Радуга диагональная
+/*#define EFF_FIRE              (1U)                          // Огонь
+#define EFF_WHITTE_FIRE       (2U)                          // Белый огонь
+#define EFF_COLORS            (6U)                          // Смена цвета
+#define EFF_MADNESS           (7U)                          // Безумие 3D
+#define EFF_CLOUDS            (8U)                          // Облака 3D
+#define EFF_LAVA              (9U)                          // Лава 3D
+#define EFF_PLASMA            (10U)                         // Плазма 3D
+#define EFF_RAINBOW           (11U)                         // Радуга 3D
+#define EFF_RAINBOW_STRIPE    (12U)                         // Павлин 3D
+#define EFF_ZEBRA             (13U)                         // Зебра 3D
+#define EFF_FOREST            (14U)                         // Лес 3D
+#define EFF_OCEAN             (15U)                         // Океан 3D
+#define EFF_COLOR             (16U)                         // Цвет
+#define EFF_SNOW              (17U)                         // Снегопад
+#define EFF_SNOWSTORM         (18U)                         // Метель
+#define EFF_STARFALL          (19U)                         // Звездопад
+#define EFF_MATRIX            (20U)                         // Матрица
+#define EFF_LIGHTERS          (21U)                         // Светлячки
+#define EFF_LIGHTER_TRACES    (22U)                         // Светлячки со шлейфом
+#define EFF_PAINTBALL         (23U)                         // Пейнтбол
+#define EFF_CUBE              (24U)                         // Блуждающий кубик
+#define EFF_WHITE_COLOR       (25U)                         // Белый свет*/
 
 #define MATRIX_WIDTH                 (60U)                         // ширина матрицы
 #define MATRIX_HEIGHT                (90U)                         // высота матрицы
@@ -95,12 +121,13 @@ MM mm;
 EEManager EEmm(mm);
 
 #define ACTIVE_PALETTES 11
+#define EFFECTS 4
 struct Effects {
   bool fav = true;
   byte scale = 50;
   byte speed = 150;
 };
-Effects effs[ACTIVE_PALETTES * 2];
+Effects effs[ACTIVE_PALETTES * 2 + EFFECTS];
 EEManager EEeff(effs);
 
 // ================== MISC DATA ==================
@@ -111,6 +138,8 @@ bool calibF = false;
 bool paintF = false;
 byte curEff = 0;
 byte forceEff = 0;
+
+bool loadingFlag = true;
 
 #ifdef DEBUG_SERIAL_GT
 #define DEBUGLN(x) Serial.println(x)
@@ -190,29 +219,12 @@ void loop() {
 
   // показываем эффект, если включены
   if (!calibF && !paintF && cfg.power) {
-    //effectsTick();
-    //sparklesRoutine();
-    //rainbowVerticalRoutine();
-    //snowStormRoutine();
-    //matrixRoutine();
-    //snowRoutine();
-    /*
-    for(int x=0;x<MATRIX_WIDTH;x++) {
-      for(int y=0;y<MATRIX_HEIGHT;y++) {
-        drawPixelXY(x,y,CRGB::White);
-      }
+    if(forceEff<ACTIVE_PALETTES*2) {
+      effects();
+    } else {
+      effectsTick();
+      FastLED.setBrightness(cfg.bright);
+      FastLED.show();
     }
-    */
-    /*drawPixelXY(5,5,CRGB::Red);
-    drawPixelXY(10,10,CRGB::Green);
-    drawPixelXY(15,15,CRGB::Blue);
-    drawPixelXY(20,20,CRGB::White);
-    drawPixelXY(25,25,CRGB::Cyan);
-    drawPixelXY(30,30,CRGB::Magenta);
-    drawPixelXY(35,35,CRGB::Yellow);*/
-    //setBrightness(cfg.bright);
-    //FastLED.show(); 
-    
-    effects();
   }
 }

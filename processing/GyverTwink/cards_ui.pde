@@ -682,7 +682,8 @@ public class Toggle {
     if (mouseX >= x && mouseX <= x+w && mouseY >= y && mouseY <= y+h && !_drop_open) {
       fill(red(c_hover), green(c_hover), blue(c_hover), 100);  
       circle(x+h/2+pos, y+h/2, h-2);
-      fill(c_hover);
+      if (value) fill(c_hover);
+      else fill(c_light);
       circle(x+h/2+pos, y+h/2, h-s_stroke);
       if (clicked && canClick) {
         value = !value;
@@ -969,9 +970,9 @@ public class DropDown {
       triangle(x+w+h/4+1, y+0.71*h+1, x+w+h*3/4+1, y+0.71*h+1, x+w+h/2+1, y+0.28*h+1);
       stroke(c_very_dark);
       fill(c_light);
-      rect(x+0, y+h, w+h, s_height*args.length);
+      //rect(x+0, y+h, w+h, s_height*args.length);
       for (int i=0; i<args.length; i++) {
-        if (Button(args[i], x, y + h + h*i, w+h, h)) {
+        if (Button(args[i], x-(w+h)*(1-i%2)*((args.length>20?1:0)), y + h + h*((int)(i/(args.length>20?2:1))), w+h, h)) {
           _drop_open = false;
           open = false;
           selected = i;

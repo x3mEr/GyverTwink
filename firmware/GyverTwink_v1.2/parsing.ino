@@ -180,6 +180,8 @@ void parsing() {
             answ[2] = effs[forceEff].scale;
             answ[3] = effs[forceEff].speed;
             reply(answ, 4);
+            DEBUG("forceEff ");
+            DEBUGLN(forceEff);
             break;
           case 1:   // флажок избранное
             effs[forceEff].fav = ubuf[4];
