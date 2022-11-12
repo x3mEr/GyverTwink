@@ -6,9 +6,11 @@ void effectsTick()
         case EFF_RAINBOW_VER:    rainbowVerticalRoutine();    break;
         case EFF_RAINBOW_HOR:    rainbowHorizontalRoutine();  break;
         case EFF_RAINBOW_DIAG:   rainbowDiagonalRoutine();    break;
+        case EFF_COLOR:          colorRoutine();              break;
+        case EFF_COLORS:         colorsRoutine();             break;
 /*        case EFF_FIRE:           fireRoutine(true);           break;
         case EFF_WHITTE_FIRE:    fireRoutine(false);          break;
-        case EFF_COLORS:         colorsRoutine();             break;
+        
         case EFF_MADNESS:        madnessNoiseRoutine();       break;
         case EFF_CLOUDS:         cloudsNoiseRoutine();        break;
         case EFF_LAVA:           lavaNoiseRoutine();          break;
@@ -18,7 +20,6 @@ void effectsTick()
         case EFF_ZEBRA:          zebraNoiseRoutine();         break;
         case EFF_FOREST:         forestNoiseRoutine();        break;
         case EFF_OCEAN:          oceanNoiseRoutine();         break;
-        case EFF_COLOR:          colorRoutine();              break;
         case EFF_SNOW:           snowRoutine();               break;
         case EFF_SNOWSTORM:      snowStormRoutine();          break;
         case EFF_STARFALL:       starfallRoutine();           break;
@@ -278,6 +279,34 @@ void rainbowDiagonalRoutine()
       float twirlFactor = 3.0F * (effs[EFF_RAINBOW_DIAG].scale / 10.0F);      // на сколько оборотов будет закручена матрица, [0..3]
       CRGB thisColor = CHSV((uint8_t)(hue + (float)(mm.w / mm.h * i + j * twirlFactor) * (float)(255 / max(mm.w, mm.h))), 255, 255);
       drawPixelXY(i, j, thisColor);
+    }
+  }
+}
+// ------------- цвета -----------------
+void colorsRoutine()
+{
+  if (loadingFlag)
+  {
+    hue += effs[EFF_COLORS].scale / 100.0F;
+
+    for (uint16_t i = 0U; i < cfg.strAm * cfg.ledAm; i++)
+    {
+      leds[i] = CHSV(hue, 255U, 255U);
+    }
+  }
+}
+
+// ------------- цвет ------------------
+void colorRoutine()
+{
+  if (loadingFlag)
+  {
+    loadingFlag = false;
+    FastLED.clear();
+
+    for (int16_t i = 0U; i < cfg.strAm * cfg.ledAm; i++)
+    {
+      leds[i] = CHSV(effs[EFF_COLOR].scale, 255U, 255U);
     }
   }
 }

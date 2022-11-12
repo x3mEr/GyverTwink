@@ -180,6 +180,7 @@ void parsing() {
             answ[2] = effs[forceEff].scale;
             answ[3] = effs[forceEff].speed;
             reply(answ, 4);
+            loadingFlag = true;
             DEBUG("forceEff ");
             DEBUGLN(forceEff);
             break;
@@ -188,9 +189,11 @@ void parsing() {
             break;
           case 2:   // масштаб
             effs[forceEff].scale = ubuf[4];
+            loadingFlag = true;
             break;
           case 3:   // скорость
             effs[forceEff].speed = ubuf[4];
+            loadingFlag = true;
             break;
         }
         break;
