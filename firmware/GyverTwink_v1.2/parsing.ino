@@ -183,6 +183,7 @@ void parsing() {
             loadingFlag = true;
             DEBUG("forceEff ");
             DEBUGLN(forceEff);
+            
             break;
           case 1:   // флажок избранное
             effs[forceEff].fav = ubuf[4];
@@ -206,6 +207,9 @@ void parsing() {
             answ[1] = mm.w;
             answ[2] = mm.h;
             DEBUG(mm.w);DEBUG(" ");DEBUGLN(mm.h);
+            DEBUG(mm.minX);DEBUG(" ");DEBUGLN(mm.maxX);
+            DEBUG(mm.minY);DEBUG(" ");DEBUGLN(mm.maxY);
+            
             reply(answ, 3);
             
             for(int i=0;i<300;i+=50) {

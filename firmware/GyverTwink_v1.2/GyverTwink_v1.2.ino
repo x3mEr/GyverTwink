@@ -9,8 +9,6 @@
 /*
   1.1 - исправлена калибровка больше 255 светодиодов
   1.2 - исправлена ошибка с калибровкой
-*/
-
 /*
   Мигает синим - открыт портал
   Мигает жёлтым - подключаемся к точке
@@ -36,9 +34,9 @@
 #define EFF_RAINBOW_DIAG      (25U)                          // Радуга диагональная
 #define EFF_COLOR             (26U)                         // Цвет
 #define EFF_COLORS            (27U)                          // Смена цвета
-/*#define EFF_FIRE              (1U)                          // Огонь
-#define EFF_WHITTE_FIRE       (2U)                          // Белый огонь
-#define EFF_MADNESS           (7U)                          // Безумие 3D
+#define EFF_FIRE              (28U)                          // Огонь
+#define EFF_WHITE_FIRE        (29U)                          // Белый огонь
+/*#define EFF_MADNESS           (7U)                          // Безумие 3D
 #define EFF_CLOUDS            (8U)                          // Облака 3D
 #define EFF_LAVA              (9U)                          // Лава 3D
 #define EFF_PLASMA            (10U)                         // Плазма 3D
@@ -121,7 +119,7 @@ MM mm;
 EEManager EEmm(mm);
 
 #define ACTIVE_PALETTES 11
-#define EFFECTS 6
+#define EFFECTS 8
 struct Effects {
   bool fav = true;
   byte scale = 50;
@@ -129,6 +127,8 @@ struct Effects {
 };
 Effects effs[ACTIVE_PALETTES * 2 + EFFECTS];
 EEManager EEeff(effs);
+
+unsigned char matrixValue[8][16];
 
 // ================== MISC DATA ==================
 Timer forceTmr(30000, false);
@@ -219,7 +219,12 @@ void loop() {
 
   // показываем эффект, если включены
   if (!calibF && !paintF && cfg.power) {
-    if(forceEff<ACTIVE_PALETTES*2) {
+      byte thisEffect;
+
+    if (forceTmr.state()) thisEffect = forceEff;
+    else thisEffect = curEff;
+    
+    if(thisEffect<ACTIVE_PALETTES*2) {
       effects();
     } else {
       effectsTick();

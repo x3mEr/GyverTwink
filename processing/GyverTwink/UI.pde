@@ -47,6 +47,8 @@ String[] effs = {
   "25. Rainbow_Diag",
   "26. Color",
   "27. Colors_change",  
+  "28. Fire",
+  "29. White_Fire",  
 };
 
 void ui() {
