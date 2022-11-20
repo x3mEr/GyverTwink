@@ -24,8 +24,8 @@
 #define LED_TYPE WS2812 // чип ленты
 #define LED_ORDER RGB   // порядок цветов ленты
 
-#define NUM_STRIPS 3
-#define NUM_LEDS_PER_STRIP 100
+#define NUM_STRIPS (4U)
+#define NUM_LEDS_PER_STRIP (100U)
 #define NUM_LEDS (NUM_LEDS_PER_STRIP * NUM_STRIPS)
 
 #define EFF_SPARKLES          (22U)                          // Конфетти
@@ -59,6 +59,10 @@
 #define MATRIX_HEIGHT                (90U)                         // высота матрицы
 #define WIDTH                 (60U)                         // ширина матрицы
 #define HEIGHT                (90U)                         // высота матрицы
+#define ROWS    (mm.h)
+#define COLS    (mm.w)
+#define N_LEDS  (cfg.strAm * cfg.ledAm)
+#define HEIGHTCORRECTOR (1)
 
 
 // имя точки в режиме AP
@@ -86,12 +90,14 @@ WiFiServer server(80);
 WiFiUDP udp;
 EEManager EEwifi(portalCfg);
 CRGB leds[NUM_LEDS];
+CRGB emuleds[NUM_LEDS];
+static uint32_t t;
 EncButton<EB_TICK, BTN_PIN> btn;
 IPAddress myIP;
 
 // ================== EEPROM BLOCKS ==================
 struct Cfg {
-  byte strAm = 3;
+  byte strAm = 4;
   byte ledAm = 100;
   bool power = 0;
   byte bright = 100;
@@ -131,13 +137,13 @@ EEManager EEeff(effs);
 unsigned char matrixValue[8][16];
 
 // ================== MISC DATA ==================
-Timer forceTmr(30000, false);
+//!Timer forceTmr(30000, false);
 Timer switchTmr(0, false);
 Timer offTmr(60000, false);
 bool calibF = false;
 bool paintF = false;
 byte curEff = 0;
-byte forceEff = 0;
+//!byte forceEff = 0;
 
 bool loadingFlag = true;
 
@@ -198,13 +204,13 @@ void loop() {
   parsing();  // парсим udp
 
   // таймер принудительного показа эффектов
-  if (forceTmr.ready()) {
-    forceTmr.stop();
-    switchEff();
-  }
+  //!if (forceTmr.ready()) {
+  //!  forceTmr.stop();
+  //!  switchEff();
+  //!}
 
   // форс выключен и настало время менять эффект
-  if (!forceTmr.state() && switchTmr.ready()) switchEff();
+  if (/*! !forceTmr.state() && */switchTmr.ready()) switchEff();
 
   // таймер выключения
   if (offTmr.ready()) {
@@ -219,10 +225,15 @@ void loop() {
 
   // показываем эффект, если включены
   if (!calibF && !paintF && cfg.power) {
-      byte thisEffect;
+    byte thisEffect;
+    thisEffect = curEff;
+    //!if (forceTmr.state()) thisEffect = forceEff;
+    //!else thisEffect = curEff;
 
-    if (forceTmr.state()) thisEffect = forceEff;
-    else thisEffect = curEff;
+      //fire2021Routine();
+      //FastLED.setBrightness(cfg.bright);
+      //FastLED.show();
+
     
     if(thisEffect<ACTIVE_PALETTES*2) {
       effects();

@@ -1,9 +1,9 @@
 void effectsTick()
 {
   byte thisEffect;
-
-  if (forceTmr.state()) thisEffect = forceEff;
-  else thisEffect = curEff;
+  thisEffect = curEff;
+  //!if (forceTmr.state()) thisEffect = forceEff;
+  //!else thisEffect = curEff;
     
   switch (thisEffect)
       {
@@ -145,9 +145,10 @@ void effects() {
 
   if (effTmr.ready()) {
     byte thisEffect;
+    thisEffect = curEff;
 
-    if (forceTmr.state()) thisEffect = forceEff;
-    else thisEffect = curEff;
+    //!if (forceTmr.state()) thisEffect = forceEff;
+    //!else thisEffect = curEff;
 
     // эффект сменился
     if (prevEff != curEff) {
@@ -333,7 +334,7 @@ void fireRoutine(bool isColored)                            // true - цветн
 // Randomly generate the next line (matrix row)
 void generateLine()
 {
-  for (uint8_t x = mm.minX; x < mm.maxX; x++)
+  for (uint8_t x = 0; x < 128; x++)
   {
     line[x] = random(64, 255);
   }
@@ -341,9 +342,9 @@ void generateLine()
 
 void shiftUp()
 {
-  for (uint8_t y = mm.maxY - 1U; y > mm.minY; y--)
+  for (uint8_t y = 16 - 1U; y > 0; y--)
   {
-    for (uint8_t x = mm.minX; x < mm.maxX; x++)
+    for (uint8_t x = 0; x < 128; x++)
     {
       uint8_t newX = x;
       if (x > 15U) newX = x % 16U;
@@ -352,7 +353,7 @@ void shiftUp()
     }
   }
 
-  for (uint8_t x = mm.minX; x < mm.maxX; x++)
+  for (uint8_t x = 0; x < 128; x++)
   {
     uint8_t newX = x;
     if (x > 15U) newX = x % 16U;
@@ -366,11 +367,12 @@ void shiftUp()
 void drawFrame(uint8_t pcnt, bool isColored)
 {
   int32_t nextv;
+  int dx=0,dy=effs[EFF_FIRE].speed;
 
   //each row interpolates with the one before it
-  for (uint8_t y = mm.maxY - 1U; y > mm.minY; y--)
+  for (uint8_t y = 16 - 1U; y > 0; y--)
   {
-    for (uint8_t x = mm.minX; x < mm.maxX; x++)
+    for (uint8_t x = 0; x < 128; x++)
     {
       uint8_t newX = x;
       if (x > 15U) newX = x % 16U;
@@ -378,48 +380,86 @@ void drawFrame(uint8_t pcnt, bool isColored)
       {
         nextv =
           (((100.0 - pcnt) * matrixValue[y][newX]
-            + pcnt * matrixValue[y - 1][newX]) / 100.0)
+            + pcnt * matrixValue[(y - 1)][newX]) / 100.0)
           - pgm_read_byte(&valueMask[y][newX]);
 
         CRGB color = CHSV(
-          isColored ? effs[EFF_FIRE].scale * 2.5 + pgm_read_byte(&hueMask[y][newX]) : 0U,     // H
+          isColored ? effs[EFF_FIRE].scale * 2.5 / 255.0 + pgm_read_byte(&hueMask[y][newX]) : 0U,     // H
           isColored ? 255U : 0U,                                                               // S
           (uint8_t)max(0, nextv)                                                               // V
         );
 
-        leds[getPixelNumber(x, y)] = color;
+        leds[getPixelNumber(dx+x, dy+y)] = color;
       }
       else if (y == 8U && SPARKLES)
       {
-        if (random(0, 20) == 0 && getPixColorXY(x, y - 1U) != 0U) drawPixelXY(x, y, getPixColorXY(x, y - 1U));
-        else drawPixelXY(x, y, 0U);
+        if (random(0, 20) == 0 && getPixColorXY(dx+x, dy+y - 1U) != 0U) drawPixelXYD(dx+x, dy+y, 5, getPixColorXY(dx+x, dy+y - 1U));
+        else drawPixelXYD(dx+x, dy+y, 5, 0U);
       }
       else if (SPARKLES)
       {
         // старая версия для яркости
-        if (getPixColorXY(x, y - 1U) > 0U)
-          drawPixelXY(x, y, getPixColorXY(x, y - 1U));
-        else drawPixelXY(x, y, 0U);
+        if (getPixColorXY(dx+x, dy+y - 1U) > 0U)
+          drawPixelXYD(dx+x, dy+y, 5, getPixColorXY(dx+x, dy+y - 1U));
+        else drawPixelXYD(dx+x, dy+y, 5, 0U);
       }
     }
   }
 
   //first row interpolates with the "next" line
-  for (uint8_t x = mm.minX; x < mm.maxX; x++)
+  for (uint8_t x = 0; x < 128; x++)
   {
     uint8_t newX = x;
     if (x > 15U) newX = x % 16U;
     CRGB color = CHSV(
-      isColored ? effs[EFF_FIRE].scale * 2.5 + pgm_read_byte(&(hueMask[0][newX])): 0U,        // H
+      isColored ? effs[EFF_FIRE].scale * 2.5 / 255.0 + pgm_read_byte(&(hueMask[0][newX])): 0U,        // H
       isColored ? 255U : 0U,                                                                   // S
       (uint8_t)(((100.0 - pcnt) * matrixValue[0][newX] + pcnt * line[newX]) / 100.0)           // V
     );
     //leds[getPixelNumber(newX, 0)] = color;                                         // на форуме пишут что это ошибка - вместо newX должно быть x, иначе
-    leds[getPixelNumber(x, 0)] = color;                                              // на матрицах шире 16 столбцов нижний правый угол неработает
+    leds[getPixelNumber(dx+x, 0)] = color;                                              // на матрицах шире 16 столбцов нижний правый угол неработает
   }
 }
 
-
+void fire2021() {
+    byte scale = 64; // 0..255
+    byte speed = 20; // 0..255
+    t += speed;
+    for (int i = 0; i < cfg.strAm * cfg.ledAm; i++) {
+      int16_t Bri = inoise8(xy[i][0] * scale, (xy[i][1] * scale) - t) - (xy[i][1] * HEIGHTCORRECTOR);
+      byte Col = Bri;
+      if (Bri <= 0) 
+        Bri = 0; 
+      else
+        Bri = 256 - (Bri * 0.2);
+      nblend(emuleds[i], ColorFromPalette(firePaletteArr[1], Col, Bri), speed);
+    }
+}
+void fire2021Routine() {
+  if (loadingFlag) {
+    loadingFlag = false;
+    for (int i = 0; i < cfg.strAm * cfg.ledAm; i++) {
+      uint16_t temp = random16((N_LEDS+COLS+ROWS)/2);
+      //xy[i][0] = random8(COLS);
+      //xy[i][1] = random8(ROWS);
+      uint8_t tmpX = COLS;
+      uint8_t tmpY = 0U;
+      while (temp >= tmpX){
+        temp -= tmpX;
+        tmpX--;
+        tmpY++;
+      }
+      xy[i][0] = temp+(COLS-tmpX)/2;
+      xy[i][1] = tmpY;
+    }
+  }
+  fire2021();
+  for (int i = 0; i < cfg.strAm * cfg.ledAm; i++) {
+    if (uint8_t(xy[i][0]) < COLS && uint8_t(xy[i][1]) < ROWS){
+      leds[ledIdxByXY(xy[i][0],xy[i][1],2)] = emuleds[i];
+    }
+  }
+}
 
 
 

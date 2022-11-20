@@ -254,7 +254,7 @@ void paintTab() {
 void switchCfg() {
   curTab = 0;
   sendData(new int[] {5, 2});
-  sendData(new int[] {2, 7});
+  sendData(new int[] {2, 7, int(offT.value)});
   stopCam();
 }
 void switchEffects() {

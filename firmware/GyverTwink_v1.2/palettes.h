@@ -246,6 +246,20 @@ const TProgmemRGBPalette16 SodiumFireColors_p PROGMEM = {CRGB::Black, 0x332100, 
 const TProgmemRGBPalette16 CopperFireColors_p PROGMEM = {CRGB::Black, 0x001a00, 0x003300, 0x004d00, 0x006600, CRGB::Green, 0x239909, 0x45b313, 0x68cc1c, 0x8ae626, CRGB::GreenYellow, 0x94f530, 0x7ceb30, 0x63e131, 0x4bd731, CRGB::LimeGreen};     //* Green
 const TProgmemRGBPalette16 AlcoholFireColors_p PROGMEM = {CRGB::Black, 0x000033, 0x000066, 0x000099, 0x0000cc, CRGB::Blue, 0x0026ff, 0x004cff, 0x0073ff, 0x0099ff, CRGB::DeepSkyBlue, 0x1bc2fe, 0x36c5fd, 0x51c8fc, 0x6ccbfb, CRGB::LightSkyBlue};  //* Blue
 
+CRGBPalette16 firePaletteArr[] = {
+  HeatColors_p,
+  Fire_gp,
+  WoodFireColors_p,
+  NormalFire_p,
+  LithiumFireColors_p,
+  SodiumFireColors_p,
+  CopperFireColors_p,
+  AlcoholFireColors_p,
+  LavaColors_p,
+  PartyColors_p,
+  RainbowColors_p,
+};
+
 CRGBPalette16 paletteArr[] = {
   /*HeatColors_p,
   Fire_gp,

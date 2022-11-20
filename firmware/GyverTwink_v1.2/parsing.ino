@@ -58,7 +58,7 @@ void parsing() {
         break;
 
       case 2:   // приём настроек
-        forceTmr.stop();
+        //!forceTmr.stop();
         switch (ubuf[3]) {
           case 0: 
             cfg.ledAm = ubuf[4];
@@ -100,7 +100,6 @@ void parsing() {
           case 6:   // нехт эффект
             switchEff();
             if (cfg.autoCh) switchTmr.restart();
-            return;
             break;
           case 7:
             cfg.turnOff = ubuf[4];
@@ -170,30 +169,34 @@ void parsing() {
         break;
 
       case 4:   // управление эффектами
-        forceTmr.restart();
+        //!forceTmr.restart();
+        cfg.autoCh = 0;
+        switchTmr.stop();
+        EEcfg.update();
         EEeff.update();
         switch (ubuf[3]) {
           case 0:   // выбор эффекта в дропе
-            forceEff = ubuf[4];
+            //!forceEff = ubuf[4];
+            curEff = ubuf[4];
             answ[0] = 4;
-            answ[1] = effs[forceEff].fav;
-            answ[2] = effs[forceEff].scale;
-            answ[3] = effs[forceEff].speed;
+            answ[1] = effs[curEff/*forceEff*/].fav;
+            answ[2] = effs[curEff/*forceEff*/].scale;
+            answ[3] = effs[curEff/*forceEff*/].speed;
             reply(answ, 4);
             loadingFlag = true;
-            DEBUG("forceEff ");
-            DEBUGLN(forceEff);
+            DEBUG("curEff ");
+            DEBUGLN(curEff);
             
             break;
           case 1:   // флажок избранное
-            effs[forceEff].fav = ubuf[4];
+            effs[curEff/*forceEff*/].fav = ubuf[4];
             break;
           case 2:   // масштаб
-            effs[forceEff].scale = ubuf[4];
+            effs[curEff/*forceEff*/].scale = ubuf[4];
             loadingFlag = true;
             break;
           case 3:   // скорость
-            effs[forceEff].speed = ubuf[4];
+            effs[curEff/*forceEff*/].speed = ubuf[4];
             loadingFlag = true;
             break;
         }
