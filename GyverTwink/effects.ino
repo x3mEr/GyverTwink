@@ -207,7 +207,8 @@ void sparklesRoutine()
 uint8_t hue;
 void rainbowVerticalRoutine()
 {
-  hue += /*4*/ (uint8_t)((effs[EFF_RAINBOW_VER].speed - 128)/16.0F);
+  /*hue += *//*4*/ /*(uint8_t)((effs[EFF_RAINBOW_VER].speed - 128)/16.0F);*/
+  hue += /*4*/ (uint8_t)((effs[EFF_RAINBOW_VER].speed)/16.0F);
   for (uint8_t j = mm.minY; j < mm.maxY; j++)
   {
     CHSV thisColor = CHSV((uint8_t)(hue + j * effs[EFF_RAINBOW_VER].scale / 32), 255, 255);
@@ -220,7 +221,8 @@ void rainbowVerticalRoutine()
 // ------------- радуга горизонтальная ----------------
 void rainbowHorizontalRoutine()
 {
-  hue += /*4*/(uint8_t)((effs[EFF_RAINBOW_HOR].speed - 128)/16.0F);
+  //hue += (uint8_t)((effs[EFF_RAINBOW_HOR].speed - 128)/16.0F);
+  hue += /*4*/(uint8_t)((effs[EFF_RAINBOW_HOR].speed)/16.0F);
   for (uint8_t i = mm.minX; i < mm.maxX; i++)
   {
     CHSV thisColor = CHSV((uint8_t)(hue + i * effs[EFF_RAINBOW_HOR].scale / 32), 255, 255);
@@ -240,7 +242,8 @@ void rainbowDiagonalRoutine()
     FastLED.clear();
   }
 
-  hue += /*8*/ (uint8_t)((effs[EFF_RAINBOW_DIAG].speed - 128)/8.0F);
+  //hue += (uint8_t)((effs[EFF_RAINBOW_DIAG].speed - 128)/8.0F);
+  hue += /*8*/ (uint8_t)((effs[EFF_RAINBOW_DIAG].speed)/8.0F);
   for (uint8_t i = mm.minX; i < mm.maxX; i++)
   {
     for (uint8_t j = mm.minY; j < mm.maxY; j++)
@@ -281,7 +284,7 @@ void colorRoutine()
 }
 
 // ------------- огонь -----------------
-#define SPARKLES              (1U)                          // вылетающие угольки вкл выкл
+#define SPARKLES 1                          // вылетающие угольки вкл выкл
 uint8_t line[256];
 uint8_t pcnt = 0U;
 

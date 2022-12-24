@@ -14,20 +14,17 @@ void portalRoutine() {
 }
 
 void startStrip() {
-  FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<LED_TYPE, D8, LED_ORDER>(leds, 3*NUM_LEDS_PER_STRIP, NUM_LEDS_PER_STRIP).setCorrection(TypicalLEDStrip);
-  
+  addStripLoop<1>(); // start from the first strip
+
   FastLED.clear(true);
   // выводим ргб
-  for(uint8_t s=0;s<NUM_STRIPS;s++) {
-    leds[s*NUM_LEDS_PER_STRIP + 0] = CRGB::Red;
-    leds[s*NUM_LEDS_PER_STRIP + 1] = CRGB::Green;
-    leds[s*NUM_LEDS_PER_STRIP + 2] = CRGB::Blue;
+  for(uint8_t Idx = 0; Idx < cfg.strAm; ++Idx) {
+    leds[Idx * cfg.ledAm + 0] = CRGB::Red;
+    leds[Idx * cfg.ledAm + 1] = CRGB::Green;
+    leds[Idx * cfg.ledAm + 2] = CRGB::Blue;
   }
 
-  FastLED.setBrightness(50);
+  FastLED.setBrightness(cfg.bright);
   FastLED.show();
 }
 

@@ -63,25 +63,16 @@ void parsing() {
           case 0: 
             cfg.ledAm = ubuf[4];
             FastLED.clear(true);
-                        
-            if(cfg.strAm<2)
-              FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
-            if(cfg.strAm<3)  
-              FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
-            if(cfg.strAm<4)
-              FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+
+            addStripLoop<1>(); // start from the first strip
 
             break;
           case 9: 
             cfg.strAm = ubuf[4];
             FastLED.clear(true);
-                        
-            if(cfg.strAm<2)
-              FastLED.addLeds<LED_TYPE, D1, LED_ORDER>(leds, 0*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
-            if(cfg.strAm<3)  
-              FastLED.addLeds<LED_TYPE, D2, LED_ORDER>(leds, 1*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
-            if(cfg.strAm<4)
-              FastLED.addLeds<LED_TYPE, D4, LED_ORDER>(leds, 2*cfg.ledAm, cfg.ledAm).setCorrection(TypicalLEDStrip);
+
+            addStripLoop<1>(); // start from the first strip
+
             break;
           case 1: cfg.power = ubuf[4];
             break;
