@@ -160,7 +160,7 @@ void addStrip(uint8_t NumLedsSoFar, uint8_t NumLedsPerStrip) {
 
 template<uint8_t TStripNumber>
 void addStripLoop() {
-  if (TStripNumber <= cfg.ledAm)
+  if (TStripNumber <= cfg.strAm)
     addStrip<STRIPS_PINS[TStripNumber - 1]>((TStripNumber - 1)*cfg.ledAm, cfg.ledAm);
     
   addStripLoop<TStripNumber + 1>();
@@ -168,6 +168,8 @@ void addStripLoop() {
 
 template<>
 void addStripLoop<MAX_AVAIL_NUM_STRIPS>() {
+  if (MAX_AVAIL_NUM_STRIPS==1)
+    addStrip<STRIPS_PINS[0]>(0, cfg.ledAm);
   // Do nothing
 }
 
